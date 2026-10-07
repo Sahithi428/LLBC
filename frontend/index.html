@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LandLensAI — Advanced Land &amp; Building Studio</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">L</span><div><b>LandLensAI</b><small>PLAN · DESIGN · BUILD</small></div></div>
+  <nav>
+    <button data-scroll="dashboard">Dashboard</button>
+    <button data-scroll="land">Land Analysis</button>
+    <button data-scroll="site">Plot Planning</button>
+    <button data-scroll="building">Building</button>
+    <button data-scroll="constructor2d">2D Constructor</button>
+    <button data-scroll="advanced">AI Architect</button>
+    <button data-scroll="visual">3D Studio</button>
+    <button data-scroll="cost">Materials & Cost</button>
+    <button data-scroll="construction">Build Timeline</button>
+    <button data-scroll="reports">Reports</button>
+  </nav>
+  <button id="themeBtn" class="icon-btn" title="Toggle theme">☾</button>
+</header>
+
+<main id="appMain">
+<!-- DASHBOARD -->
+<section id="dashboard" class="hero">
+  <div>
+    <span class="eyebrow">AI-ASSISTED LAND PLANNING PLATFORM</span>
+    <h1>From real land measurements to a complete <span>3D building concept.</span></h1>
+    <p>Analyze land, divide plots, design every floor, explore the offline 3D building studio and generate a complete construction estimate in one connected workflow.</p>
+    <div class="hero-actions"><button class="primary" data-scroll="land">Start Land Analysis →</button><button class="secondary" data-scroll="visual">View 3D Studio</button></div>
+  </div>
+  <div class="hero-card premium-hero-card">
+    <div class="hero-card-top"><span class="live-dot"></span><span>PROJECT COMMAND CENTER</span><strong>LIVE</strong></div>
+    <div class="hero-preview"><div class="preview-orbit"><div class="orbit-ring ring-a"></div><div class="orbit-ring ring-b"></div><div class="preview-building"><i></i><i></i><i></i><i></i><b>3D</b></div></div><div class="preview-copy"><small>CONNECTED WORKFLOW</small><b>Land → Plot → Build</b><span>One workspace for the full concept.</span></div></div>
+    <div class="metric"><span>AI Measurement</span><b id="heroMeasureStatus">Ready to calibrate</b></div>
+    <div class="metric"><span>3D Engine</span><b><span class="status-good">●</span> Offline Ready</b></div>
+    <div class="metric"><span>Design Mode</span><b id="heroDesignStatus">Conceptual BIM</b></div>
+  </div>
+</section>
+
+<section id="projectProgress" class="project-progress-section">
+  <div class="progress-shell">
+    <div class="progress-heading"><div><span class="eyebrow">PROJECT CONTROL</span><h2>Build your concept step by step</h2><p id="progressMessage">Start with your land image. LandLensAI will unlock each stage as you move forward.</p></div><div class="progress-score"><strong id="progressPercent">0%</strong><span>project ready</span></div></div>
+    <div class="progress-track"><span id="progressBar"></span></div>
+    <div id="progressSteps" class="progress-steps"></div>
+    <div class="quick-actions"><button class="quick-action" data-scroll="land"><span>01</span><b>Measure land</b><small>Calibrate the boundary</small></button><button class="quick-action" data-scroll="site"><span>02</span><b>Plan plots</b><small>Roads, park &amp; parking</small></button><button class="quick-action" data-scroll="building"><span>03</span><b>Design building</b><small>Rooms &amp; floors</small></button><button class="quick-action" data-scroll="visual"><span>04</span><b>Explore 3D</b><small>Orbit your concept</small></button></div>
+  </div>
+</section>
+
+<section class="stats">
+  <div><small>LAND AREA</small><strong id="statArea">—</strong></div>
+  <div><small>PLOTS</small><strong id="statPlots">—</strong></div>
+  <div><small>BUILDING</small><strong id="statBuilding">—</strong></div>
+  <div><small>EST. COST</small><strong id="statCost">—</strong></div>
+</section>
+
+<!-- LAND ANALYSIS -->
+<section id="land" class="section">
+  <div class="section-head"><div><span class="eyebrow">01 · LAND ANALYSIS</span><h2>Real measurement calibration</h2><p>User measurements are used as the reference; the photo supplies visual boundary information.</p></div></div>
+  <div class="grid-2">
+    <div class="panel">
+      <h3>Upload land image</h3>
+      <label class="dropzone" id="dropzone"><input type="file" id="imageInput" accept=".jpg,.jpeg,.png,.webp"><span>＋</span><b>Choose land image</b><small>JPG, PNG or WEBP · max 15 MB</small></label>
+      <div id="boundaryPicker" class="boundary-picker hidden">
+        <img id="landPreview" class="preview" alt="Uploaded land image">
+        <svg id="boundaryPickerSvg" class="boundary-picker-svg" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="boundary-picker-hint">Click the 4 land corners in order: Front-Left → Front-Right → Back-Right → Back-Left. Enter Length and Width; the boundary automatically resizes to the entered dimensions. Opposite sides stay synchronized.</div>
+      </div>
+      <div class="picker-actions">
+        <button id="resetBoundary" class="small-btn" type="button">Reset corners</button>
+        <button id="autoBoundary" class="small-btn" type="button">Use image rectangle</button>
+        <span class="boundary-help">Click inside the image to add 3–20 corners. Each edge can have its own measurement.</span>
+        <span id="boundaryCount" class="badge">0 / 4 corners</span>
+      </div>
+      <div class="measure-head"><h3>Real boundary measurements</h3><span class="badge">4-side or irregular 3–20 point calibration</span></div>
+      <div id="measurements" class="measurements"></div>
+      <div class="analysis-mode-note"><b>How it works:</b> upload any land/plot photo or sketch, enter the real side lengths, then click the visible land corners. LandLensAI calculates the calibrated area and maps the dimensions onto your image.</div>
+      <button id="analyzeBtn" class="primary full">Analyze Image &amp; Calibrate Dimensions</button>
+    </div>
+    <div class="panel">
+      <div class="panel-title"><h3>Calibrated boundary</h3><span id="confidenceBadge" class="badge">Waiting</span></div>
+      <div id="landCanvas" class="land-canvas"><div class="empty-state">Upload an image and enter real measurements.</div></div>
+      <div id="analysisCards" class="mini-grid"></div>
+      <div id="warnings" class="warnings"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SITE PLANNING -->
+<section id="site" class="section">
+  <div class="section-head"><div><span class="eyebrow">02 · SITE PLANNING</span><h2>Plots, roads, park &amp; common parking</h2></div></div>
+  <div class="grid-2">
+    <div class="panel controls">
+      <label>Number of plots<input id="plotCount" type="number" min="2" max="20" value="6"></label>
+      <label>Main road width (ft)<input id="mainRoad" type="number" value="30"></label>
+      <label>Internal road width (ft)<input id="internalRoad" type="number" value="20"></label>
+      <div class="two">
+        <label>Common park (%)<input id="parkPct" type="number" min="0" max="30" value="10"></label>
+        <label>Common parking (%)<input id="parkingPct" type="number" min="0" max="20" value="7"></label>
+      </div>
+      <button id="generateLayouts" class="primary full">Generate Layout Options</button>
+      <div id="layoutOptions"></div>
+      <div class="site-edit-tools">
+        <div class="panel-title"><h3>Site customization</h3><span class="badge">Edit after generation</span></div>
+        <div class="two">
+          <button id="addPlot" class="secondary">＋ Add Plot</button>
+          <button id="removePlot" class="secondary">− Remove Plot</button>
+        </div>
+        <div class="two">
+          <label>Selected plot width (ft)<input id="selectedPlotWidth" type="number" min="5" step="0.5" placeholder="—"></label>
+          <label>Selected plot length (ft)<input id="selectedPlotLength" type="number" min="5" step="0.5" placeholder="—"></label>
+        </div>
+        <button id="applyPlotDimensions" class="secondary full">Update Selected Plot Dimensions</button>
+        <div class="two plot-amenity-actions">
+          <button id="addPlotPark" class="secondary" type="button">🌳 Add Park</button>
+          <button id="addPlotParking" class="secondary" type="button">🅿 Add Parking</button>
+        </div>
+        <div class="two">
+          <label>Park size (%)<input id="plotParkSize" type="number" min="5" max="60" value="25"></label>
+          <label>Parking size (%)<input id="plotParkingSize" type="number" min="5" max="60" value="20"></label>
+        </div>
+        <div id="plotAmenityStatus" class="site-edit-note">No plot amenity selected.</div>
+        <div class="site-edit-note">Select a plot on the plan, then change its dimensions. Add/remove plots without regenerating the entire project.</div>
+      </div>
+    </div>
+    <div class="panel"><div class="panel-title"><h3>Interactive site plan</h3><span id="selectedPlotBadge" class="badge">No plot selected</span></div><div id="sitePlan" class="site-plan"><div class="empty-state">Analyze land and generate a layout.</div></div></div>
+  </div>
+</section>
+
+<!-- BUILDING CONSTRUCTOR -->
+<section id="building" class="section">
+  <div class="section-head"><div><span class="eyebrow">03 · BUILDING CONSTRUCTOR</span><h2>Choose building type &amp; design floor-by-floor</h2></div><div class="view-actions"><button id="customizeBuildingBtn" class="secondary" title="Customize building">⚙ Customize Building</button><button id="addBuildingBtn" class="primary" title="Add another building">＋ Add Building</button></div></div>
+
+  <!-- Building type selector cards -->
+  <div class="btype-section">
+    <h3 class="btype-label">Select building type</h3>
+    <div class="btype-grid" id="btypeGrid">
+      <button class="btype-card active" data-btype="House">🏠<span>House</span></button>
+      <button class="btype-card" data-btype="Villa">🏡<span>Villa</span></button>
+      <button class="btype-card" data-btype="Apartment Building">🏢<span>Apartment</span></button>
+      <button class="btype-card" data-btype="Duplex">🏘<span>Duplex</span></button>
+      <button class="btype-card" data-btype="Commercial Building">🏬<span>Commercial</span></button>
+      <button class="btype-card" data-btype="Office">🏛<span>Office</span></button>
+      <button class="btype-card" data-btype="Hotel">🏨<span>Hotel</span></button>
+      <button class="btype-card" data-btype="Warehouse">🏭<span>Warehouse</span></button>
+      <button class="btype-card" data-btype="Mixed-use">🏗<span>Mixed-use</span></button>
+    </div>
+    <div id="btypeDesc" class="btype-desc">Choose a building type to load its recommended room program and planning defaults.</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel controls">
+      <input type="hidden" id="buildingType" value="House">
+      <label>Selected plot<select id="buildingPlot"></select></label>
+      <label>Building style<select id="buildingStyle"><option>Modern Contemporary</option><option>Minimal Modern</option><option>Warm Contemporary</option><option>Classic</option></select></label>
+      <div class="two"><label>Width (ft)<input id="bWidth" type="number" value="24"></label><label>Length (ft)<input id="bLength" type="number" value="30"></label></div>
+      <label>Floors<select id="floors"><option value="1">Ground only</option><option value="2">G+1</option><option value="3" selected>G+2</option><option value="4">G+3</option></select></label>
+      <div class="two">
+        <label>Quality<select id="quality"><option value="standard">Standard</option><option value="premium">Premium</option><option value="luxury">Luxury</option></select></label>
+        <label>Rate / ft²<input id="rateSqft" type="number" value="2200"></label>
+      </div>
+      <div class="four">
+        <label>Front setback<input id="setFront" type="number" value="5"></label>
+        <label>Rear setback<input id="setRear" type="number" value="5"></label>
+        <label>Left setback<input id="setLeft" type="number" value="3"></label>
+        <label>Right setback<input id="setRight" type="number" value="3"></label>
+      </div>
+      <button id="generateBuilding" class="primary full">Generate Building</button>
+      <button id="open2dConstructor" class="secondary full">Open 2D Constructor →</button>
+      <div id="buildingSummary" class="summary"></div>
+    </div>
+
+    <!-- Floor plan + room editor -->
+    <div class="panel building-right-panel">
+      <div class="panel-title">
+        <h3>Floor plan</h3>
+        <div id="floorTabs" class="tabs"></div>
+      </div>
+      <div id="floorPlan" class="floor-plan"><div class="empty-state">Select a plot and generate a building.</div></div>
+
+      <!-- Room editor (shown after building generated) -->
+      <div id="roomEditor" class="room-editor hidden">
+        <div class="room-editor-head">
+          <h4>Room editor — <span id="roomEditorFloorLabel">Ground</span></h4>
+          <span id="roomCountBadge" class="badge">0 rooms</span>
+        </div>
+
+        <!-- Current rooms list -->
+        <div id="roomList" class="room-list"></div>
+
+        <!-- Add room section -->
+        <div class="add-room-section">
+          <div class="add-room-head">
+            <span class="add-room-title">➕ Add room</span>
+            <div class="add-room-search-wrap"><input id="roomSearch" class="room-search" placeholder="Search or type room name…" autocomplete="off"></div>
+          </div>
+          <div id="roomChips" class="room-chips"></div>
+          <div class="add-room-custom">
+            <input id="customRoomName" class="custom-room-input" placeholder="Custom room name…">
+            <button id="addCustomRoom" class="secondary">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUILDING CUSTOMIZE MODAL -->
+<div id="buildingCustomizeModal" class="modal-overlay hidden" aria-hidden="true">
+  <div class="modal-card building-customize-modal">
+    <div class="modal-head"><div><span class="eyebrow">BUILDING CUSTOMIZER</span><h3>Customize building</h3><p>Change the building dimensions, floors and presentation style.</p></div><button id="closeCustomizeBuilding" class="icon-btn" title="Close">×</button></div>
+    <div class="customize-grid">
+      <label>Building name<input id="customBuildingName" value="My Building" placeholder="e.g. Family Villa"></label>
+      <label>Building type<select id="customBuildingType"><option value="House">House</option><option value="Villa">Villa</option><option value="Apartment Building">Apartment</option><option value="Duplex">Duplex</option><option value="Commercial Building">Commercial</option><option value="Office">Office</option><option value="Hotel">Hotel</option><option value="Warehouse">Warehouse</option><option value="Mixed-use">Mixed-use</option></select></label>
+      <label>Width (ft)<input id="customBuildingWidth" type="number" min="18" step="0.5" value="24"></label>
+      <label>Length (ft)<input id="customBuildingLength" type="number" min="24" step="0.5" value="30"></label>
+      <label>Floors<select id="customBuildingFloors"><option value="1">Ground only</option><option value="2">G+1</option><option value="3" selected>G+2</option><option value="4">G+3</option></select></label>
+      <label>Style<select id="customBuildingStyle"><option>Modern Contemporary</option><option>Minimal Modern</option><option>Warm Contemporary</option><option>Classic</option></select></label>
+      <label>Quality<select id="customBuildingQuality"><option value="standard">Standard</option><option value="premium">Premium</option><option value="luxury">Luxury</option></select></label>
+      <label>Rate / ft²<input id="customBuildingRate" type="number" min="500" step="50" value="2200"></label>
+    </div>
+    <div class="modal-actions"><button id="cancelCustomizeBuilding" class="secondary">Cancel</button><button id="applyCustomizeBuilding" class="primary">Apply &amp; Regenerate</button></div>
+  </div>
+</div>
+
+<!-- 2D CONSTRUCTOR -->
+<section id="constructor2d" class="section">
+  <div class="section-head"><div><span class="eyebrow">04 · 2D CONSTRUCTOR</span><h2>Interactive floor-plan constructor</h2><p>Select a floor, inspect every room, and use the room editor to add or remove spaces.</p></div><div class="view-actions"><button id="2dBackToBuilding" class="secondary">Back to Building</button><button id="2dTo3d" class="primary">Open 3D Studio →</button></div></div>
+  <div class="constructor2d-grid">
+    <div class="panel constructor2d-main">
+      <div class="panel-title"><div><h3>2D Floor Plan</h3><small id="constructor2dMeta" class="constructor2d-meta">Generate a building to begin.</small></div><div id="constructor2dTabs" class="tabs"></div></div>
+      <div id="constructor2dPlan" class="constructor2d-plan"><div class="empty-state">Generate a building in Building Constructor first.</div></div>
+      <div class="constructor2d-legend"><span><i class="legend-swatch living"></i>Living</span><span><i class="legend-swatch bed"></i>Bedroom</span><span><i class="legend-swatch bath"></i>Bathroom</span><span><i class="legend-swatch kitchen"></i>Kitchen</span><span><i class="legend-swatch dining"></i>Dining</span><span><i class="legend-swatch utility"></i>Other</span></div>
+    </div>
+    <div class="panel constructor2d-side">
+      <h3>2D Plan Controls</h3>
+      <div class="constructor-stat"><span>Building</span><b id="constructor2dBuilding">—</b></div>
+      <div class="constructor-stat"><span>Floor</span><b id="constructor2dFloor">—</b></div>
+      <div class="constructor-stat"><span>Rooms</span><b id="constructor2dRooms">—</b></div>
+      <div class="constructor-stat"><span>Dimensions</span><b id="constructor2dDims">—</b></div>
+      <button id="constructor2dEditRooms" class="primary full">Edit Rooms in Building Constructor</button>
+      <div class="tip"><b>Presentation mode</b><br>Each room is color-coded and labelled with its name and dimensions. This is a conceptual 2D plan, ready to explain during your demo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- AI ARCHITECT -->
+<section id="advanced" class="section">
+  <div class="section-head"><div><span class="eyebrow">05 · AI ARCHITECT INTELLIGENCE</span><h2>Validate, customize &amp; optimize your building</h2><p>Use natural-language commands to make controlled changes to the generated conceptual plan.</p></div></div>
+  <div class="grid-2">
+    <div class="panel">
+      <h3>AI Building Assistant</h3>
+      <div class="ai-command"><input id="aiCommand" placeholder="e.g. Add one bedroom and enlarge the master bedroom"><button id="aiCustomize" class="primary">Apply Change</button></div>
+      <div id="validationPanel" class="advanced-grid"><div class="empty-state">Generate a building to validate it.</div></div>
+    </div>
+    <div class="panel"><h3>Sunlight &amp; ventilation</h3><div id="sunPanel" class="advanced-grid"><div class="empty-state">Generate a building to analyze it.</div></div></div>
+  </div>
+</section>
+
+<!-- 3D STUDIO -->
+<section id="visual" class="section">
+  <div class="section-head">
+    <div><span class="eyebrow">06 · REALISTIC 3D STUDIO</span><h2>Interactive architectural visualization</h2><p>Offline interactive 3D geometry — rooms, floors, roof, furniture, materials &amp; lighting. No CDN required.</p></div>
+    <div class="view-actions">
+      <button id="allFloors" class="secondary">All Floors</button>
+      <button id="explode" class="secondary">Explode</button>
+      <button id="roofBtn" class="secondary">Hide Roof</button>
+      <button id="walkBtn" class="secondary">Walkthrough</button>
+      <button id="resetCam" class="secondary">Reset View</button>
+      <button id="interiorCutaway" class="secondary">Interior Cutaway</button>
+      <button id="full3d" class="primary">Fullscreen</button>
+    </div>
+  </div>
+  <div class="visual-grid">
+    <div id="threeWrap" class="three-wrap"><div id="threeLoading">Generate a building to start the 3D studio.</div></div>
+    <div class="side-panel-3d">
+      <div class="panel material-panel">
+        <h3>Visualization controls</h3>
+        <label>Visualization<select id="visualMode"><option value="realistic">Realistic Architectural</option><option value="concept">Conceptual</option><option value="blueprint">Blueprint</option></select></label>
+        <label>Exterior material<select id="wallMat"><option value="white">Modern Plaster</option><option value="stone">Stone Accent</option><option value="brick">Brick</option><option value="concrete">Concrete</option></select></label>
+        <label>Floor material<select id="floorMat"><option value="tile">Tiles</option><option value="marble">Marble</option><option value="wood">Wood</option></select></label>
+        <label>Furniture<select id="furnitureMode"><option value="on">Show furniture</option><option value="off">Hide furniture</option></select></label>
+        <div class="three-color-panel">
+          <div class="panel-title"><h3>🎨 Building colors</h3><span class="badge">Per floor</span></div>
+          <label>Default building color<input id="buildingColor" type="color" value="#e8e4dc"></label>
+          <div id="floorColorControls" class="floor-color-controls"></div>
+          <button id="apply3dColors" class="secondary full" type="button">Apply Colors</button>
+        </div>
+        <div class="three-furniture-panel">
+          <div class="panel-title"><h3>🛋 Furniture &amp; fixtures</h3><span class="badge">Room-by-room</span></div>
+          <label>Floor<select id="furnitureFloorSelect"></select></label>
+          <label>Room<select id="furnitureRoomSelect"></select></label>
+          <label>Furniture preset<select id="furniturePreset"><option value="bed-set">Bed + side tables</option><option value="wardrobe">Wardrobe</option><option value="sofa-set">Sofa + coffee table</option><option value="dining-set">Dining table + chairs</option><option value="kitchen-set">Kitchen counter</option><option value="bath-fixtures">Bathroom fixtures</option><option value="study-set">Study desk + chair</option><option value="car">Car / parking</option><option value="tv-unit">TV unit</option><option value="toilet">Toilet / WC</option><option value="shower">Shower</option><option value="plant">Indoor plant</option><option value="default">Auto by room</option><option value="none">Remove all furniture</option></select></label>
+          <button id="applyFurniturePreset" class="secondary full" type="button">＋ Add Furniture</button>
+          <button id="clearRoomFurniture" class="small-btn full" type="button">− Remove All Furniture</button>
+          <div id="roomFurnitureList" class="furniture-chip-list"></div>
+          <small class="three-control-help">Select a floor and room, then add multiple furniture items. Remove any individual item from the list.</small>
+        </div>
+        <label>Lighting<select id="lightMode"><option value="day">Day</option><option value="evening">Evening</option><option value="night">Night</option></select></label>
+        <label>Shadow quality<select id="shadowQuality"><option value="high">High</option><option value="medium">Medium</option><option value="off">Off</option></select></label>
+        <button id="apply3d" class="secondary full">Apply Visualization</button>
+        <div class="tip"><b>Controls</b><br>Left drag = orbit · Wheel = zoom · Right drag = pan · Double-click = focus room</div>
+      </div>
+      <div class="panel floor-vis-panel" id="floorVisPanel">
+        <h3>Floor visibility</h3>
+        <div id="floorVisButtons" class="floor-vis-btns"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COST -->
+<section id="cost" class="section">
+  <div class="section-head"><div><span class="eyebrow">07 · ESTIMATION</span><h2>Materials &amp; construction cost</h2></div></div>
+  <div class="cost-dashboard"><div id="costPanel" class="cost-grid"><div class="empty-state">Generate a building to calculate the estimate.</div></div><div class="cost-analytics-grid"><div class="panel chart-panel"><div class="panel-title"><h3>Cost composition</h3><span class="badge">Estimate</span></div><div class="donut-wrap"><div id="costDonut" class="donut-chart"><div class="donut-hole"><b>₹—</b><small>Total</small></div></div><div id="costLegend" class="chart-legend"></div></div></div><div class="panel chart-panel"><div class="panel-title"><h3>Material composition</h3><span class="badge">Quantity mix</span></div><div class="donut-wrap"><div id="materialDonut" class="donut-chart material-donut"><div class="donut-hole"><b>100%</b><small>Materials</small></div></div><div id="materialLegend" class="chart-legend"></div></div></div></div></div>
+</section>
+
+<!-- CONSTRUCTION PLANNING -->
+<section id="construction" class="section">
+  <div class="section-head"><div><span class="eyebrow">08 · CONSTRUCTION PLANNER</span><h2>Time, workforce &amp; project schedule</h2><p>Generate an approximate construction schedule from your building size, floors, rooms and quality level.</p></div></div>
+  <div class="construction-summary" id="constructionSummary">
+    <div class="empty-state">Generate a building to estimate construction time and workforce.</div>
+  </div>
+  <div class="construction-grid">
+    <div class="panel"><div class="panel-title"><h3>Construction timeline</h3><span class="badge">Planning estimate</span></div><div id="constructionTimeline" class="construction-timeline"><div class="empty-state">No schedule yet.</div></div></div>
+    <div class="panel"><div class="panel-title"><h3>Workforce by phase</h3><span class="badge">Approx.</span></div><div id="workforcePanel" class="workforce-panel"><div class="empty-state">No workforce estimate yet.</div></div></div>
+  </div>
+  <div class="planning-note">These are conceptual planning estimates, not construction guarantees. Actual time and staffing depend on site conditions, approvals, weather, material availability, contractor practices and local labour supply.</div>
+</section>
+
+<!-- REPORTS -->
+<section id="reports" class="section">
+  <div class="section-head"><div><span class="eyebrow">09 · PROJECTS &amp; REPORTS</span><h2>Save and export</h2></div></div>
+  <div class="panel report-actions">
+    <input id="projectName" placeholder="Project name" value="My LandLens Project">
+    <button id="saveProject" class="primary">Save Project</button>
+    <button id="downloadReport" class="secondary">Generate PDF Report</button>
+    <button id="newProject" class="secondary">New Project</button><button id="deleteCurrentProject" class="danger-btn" disabled>🗑 Delete Project</button>
+  </div>
+  <div id="projectHistory" class="history"></div>
+</section>
+</main>
+
+<footer>LandLensAI · Conceptual planning and visualization platform · Verify survey, structural and regulatory requirements before construction.</footer>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
